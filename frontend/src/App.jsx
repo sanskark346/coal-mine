@@ -19,8 +19,9 @@ import FAQ from './pages/public/FAQ';
 import Contact from './pages/public/Contact';
 
 function Guard({ roles }) {
-  const { user, loading } = useAuth();
+  const { user, loading, authError, retry } = useAuth();
   if (loading) return <Spinner />;
+  if (!user && authError) return <div className="loginwrap pub"><div className="loginbox"><div className="msg err">{authError}</div><button onClick={retry}>Try again</button></div></div>;
   if (!user) return <Navigate to="/login" replace />;
   if (roles && !roles.includes(user.role)) return <Navigate to="/dashboard" replace />;
   return <Layout />;

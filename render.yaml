@@ -1,0 +1,18 @@
+# Optional "Blueprint" for Render. You can also create the service by hand (see README).
+services:
+  - type: web
+    name: coalguard-api
+    runtime: node
+    rootDir: backend
+    buildCommand: npm install
+    startCommand: npm start
+    healthCheckPath: /api/health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: JWT_SECRET
+        generateValue: true
+      - key: MONGODB_URI
+        sync: false        # you paste the Atlas connection string in the Render dashboard
+      - key: CORS_ORIGINS
+        sync: false        # your Vercel address, e.g. https://coal-mine-j6sb.vercel.app

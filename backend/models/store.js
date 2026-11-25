@@ -11,7 +11,12 @@ exports.init = (m, mongoose) => {
   if (m === 'json') { try { mem = JSON.parse(fs.readFileSync(FILE, 'utf8')); } catch (e) { mem = {}; } }
 };
 const save = () => { fs.mkdirSync(path.dirname(FILE), { recursive: true }); fs.writeFileSync(FILE, JSON.stringify(mem, null, 1)); };
-const M = n => models[n] || (models[n] = mg.model(n, new mg.Schema({ id: { type: String, index: true } }, { strict: false, versionKey: false })));
+const M = n => {
+  if (models[n]) return models[n];
+  const schema = new mg.Schema({ id: { type: String, index: true } }, { strict: false, versionKey: false });
+  if (n === 'users') schema.index({ email: 1 }, { unique: true, sparse: true }); // no duplicate accounts, even under a race
+  return (models[n] = mg.model(n, schema));
+};
 const clean = d => { const { _id, ...r } = d; return r; };
 const match = (o, f) => Object.keys(f).every(k => o[k] === f[k]);
 exports.col = n => ({

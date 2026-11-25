@@ -14,7 +14,7 @@ router.patch('/users/:id', auth, allow('admin'), w(A.patchUser));
 router.delete('/users/:id', auth, allow('admin'), w(A.deleteUser));
 
 router.get('/dashboard/stats', auth, w(R.dashboard));
-router.get('/activity', auth, w(R.activity));
+router.get('/activity', auth, allow('admin'), w(R.activity));
 
 router.get('/mines', auth, w(M.list));
 router.get('/mines/:id', auth, w(M.get));

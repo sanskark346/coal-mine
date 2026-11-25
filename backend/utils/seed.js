@@ -6,7 +6,12 @@ const ago = d => new Date(Date.now() - d * 864e5).toISOString();
 const ymd = d => ago(d).slice(0, 10);
 
 module.exports = async () => {
-  if ((await db.users.find()).length) return;
+  if ((await db.users.find()).length) {
+    // Database already has data: only make sure the three documented demo accounts exist (never overwrites anything).
+    for (const [name, email, pw, role, org] of [['Anita Rao (Admin)', 'admin@coal.gov', 'Admin@123', 'admin', 'Ministry of Coal'], ['R. K. Singh (Operator)', 'operator@coal.gov', 'Operator@123', 'operator', 'BCCL'], ['S. Khan (Inspector)', 'inspector@coal.gov', 'Inspector@123', 'inspector', 'DGMS']])
+      if (!(await db.users.find({ email })).length) { await db.users.create({ name, email, role, organisation: org, active: true, password: await bcrypt.hash(pw, 10) }); console.log('Created missing demo account ' + email); }
+    return;
+  }
   console.log('Seeding demonstration data...');
   const mk = async (name, email, pw, role, org) => db.users.create({ name, email, role, organisation: org, active: true, password: await bcrypt.hash(pw, 10) });
   const admin = await mk('Anita Rao (Admin)', 'admin@coal.gov', 'Admin@123', 'admin', 'Ministry of Coal');
